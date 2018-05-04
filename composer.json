@@ -18,6 +18,7 @@
     },
     "require-dev": {
         "behat/behat": "^3.4",
+        "behat/mink": "^1.7",
         "doctrine/doctrine-fixtures-bundle": "^3.0",
         "nelmio/alice": "^3.3",
         "sensiolabs/security-checker": "^4.1",
