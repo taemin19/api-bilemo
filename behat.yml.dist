@@ -4,6 +4,9 @@ default:
             contexts:
                 - FeatureContext:
                     kernel: '@kernel'
+                - Behat\MinkExtension\Context\MinkContext
+                - behatch:context:json
+                - behatch:context:rest
 
     extensions:
         Behat\Symfony2Extension:
@@ -15,3 +18,4 @@ default:
             sessions:
             default:
                 symfony2: ~
+        Behatch\Extension: ~
