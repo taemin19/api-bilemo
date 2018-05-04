@@ -25,4 +25,26 @@ class UsersController extends Controller
 
         return JsonResponse::fromJsonString($data);
     }
+
+    /**
+     * @param int $id
+     * @return JsonResponse
+     *
+     * @Route("/users/{id}", name="users_show")
+     * @Method("GET")
+     */
+    public function showAction(int $id)
+    {
+        $user = $this->getDoctrine()
+            ->getRepository('App:User')
+            ->find($id);
+
+        if (empty($user)) {
+            return new JsonResponse(['message' => 'Not found.'], 404);
+        }
+
+        $data = $this->get('serializer')->serialize($user, 'json');
+
+        return JsonResponse::fromJsonString($data);
+    }
 }

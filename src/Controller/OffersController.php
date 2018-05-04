@@ -32,4 +32,27 @@ class OffersController extends Controller
 
         return JsonResponse::fromJsonString($data);
     }
+
+    /**
+     * @param int $id
+     * @param int $offer_id
+     * @return JsonResponse
+     *
+     * @Route("/products/{id}/offers/{offer_id}", name="offers_show")
+     * @Method("GET")
+     */
+    public function showAction(int $id, int $offer_id)
+    {
+        $offer = $this->getDoctrine()
+            ->getRepository('App:Offer')
+            ->find($offer_id);
+
+        if (empty($offer) || !($offer->getProduct()->getId() === $id)) {
+            return new JsonResponse(['message' => 'Not found.'], 404);
+        }
+
+        $data = $this->get('serializer')->serialize($offer, 'json', ['groups' => ['offer']]);
+
+        return JsonResponse::fromJsonString($data);
+    }
 }
