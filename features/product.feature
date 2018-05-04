@@ -13,6 +13,10 @@ Feature: Product
     And the JSON node "brand" should exist
     And the JSON node "description" should exist
     And the JSON node "offers" should exist
+    And the JSON node "offers[0].id" should exist
+    And the JSON node "offers[0].price" should exist
+    But the JSON node "offers[0].storage" should not exist
+    But the JSON node "offers[0].product" should not exist
 
   Scenario: Retrieve a collection of products
     When I send a "GET" request to "/products"
