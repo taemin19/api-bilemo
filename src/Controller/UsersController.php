@@ -30,7 +30,7 @@ class UsersController extends Controller
      * @param int $id
      * @return JsonResponse
      *
-     * @Route("/users/{id}", name="users_show")
+     * @Route("/users/{id}", name="users_show", requirements={"id"="\d+"})
      * @Method("GET")
      */
     public function showAction(int $id)
@@ -46,5 +46,29 @@ class UsersController extends Controller
         $data = $this->get('serializer')->serialize($user, 'json');
 
         return JsonResponse::fromJsonString($data);
+    }
+
+    /**
+     * @param int $id
+     * @return JsonResponse
+     *
+     * @Route("/users/{id}", name="users_delete", requirements={"id"="\d+"})
+     * @Method("DELETE")
+     */
+    public function deleteAction(int $id)
+    {
+        $user =$this->getDoctrine()
+            ->getRepository('App:User')
+            ->find($id);
+
+        // Idempotent: return a 204 in all cases
+        if ($user) {
+            $em = $this->getDoctrine()->getManager();
+
+            $em->remove($user);
+            $em->flush();
+        }
+
+        return new JsonResponse(null, 204);
     }
 }
