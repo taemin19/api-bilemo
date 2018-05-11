@@ -2,10 +2,7 @@
 
 namespace App\Entity;
 
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
-use Symfony\Component\Serializer\Annotation\Groups;
 
 /**
  * @ORM\Table(name="products")
@@ -17,38 +14,38 @@ class Product
      * @ORM\Id()
      * @ORM\GeneratedValue()
      * @ORM\Column(type="integer")
-     * @Groups({"list","product","offer"})
      */
     private $id;
 
     /**
      * @ORM\Column(type="string", length=255)
-     * @Groups({"list","product","offer"})
      */
     private $model;
 
     /**
      * @ORM\Column(type="string", length=255)
-     * @Groups({"product"})
      */
     private $brand;
 
     /**
-     * @ORM\Column(type="text")
-     * @Groups({"product"})
+     * @ORM\Column(type="smallint")
      */
-    private $description;
+    private $storage;
 
     /**
-     * @ORM\OneToMany(targetEntity="App\Entity\Offer", mappedBy="product")
-     * @Groups({"product"})
+     * @ORM\Column(type="string", length=255)
      */
-    private $offers;
+    private $color;
 
-    public function __construct()
-    {
-        $this->offers = new ArrayCollection();
-    }
+    /**
+     * @ORM\Column(type="float")
+     */
+    private $price;
+
+    /**
+     * @ORM\Column(type="text")
+     */
+    private $description;
 
     public function getId()
     {
@@ -79,6 +76,42 @@ class Product
         return $this;
     }
 
+    public function getStorage(): ?int
+    {
+        return $this->storage;
+    }
+
+    public function setStorage(int $storage): self
+    {
+        $this->storage = $storage;
+
+        return $this;
+    }
+
+    public function getColor(): ?string
+    {
+        return $this->color;
+    }
+
+    public function setColor(string $color): self
+    {
+        $this->color = $color;
+
+        return $this;
+    }
+
+    public function getPrice(): ?float
+    {
+        return $this->price;
+    }
+
+    public function setPrice(float $price): self
+    {
+        $this->price = $price;
+
+        return $this;
+    }
+
     public function getDescription(): ?string
     {
         return $this->description;
@@ -87,37 +120,6 @@ class Product
     public function setDescription(string $description): self
     {
         $this->description = $description;
-
-        return $this;
-    }
-
-    /**
-     * @return Collection|Offer[]
-     */
-    public function getOffers(): Collection
-    {
-        return $this->offers;
-    }
-
-    public function addOffer(Offer $offer): self
-    {
-        if (!$this->offers->contains($offer)) {
-            $this->offers[] = $offer;
-            $offer->setProduct($this);
-        }
-
-        return $this;
-    }
-
-    public function removeOffer(Offer $offer): self
-    {
-        if ($this->offers->contains($offer)) {
-            $this->offers->removeElement($offer);
-            // set the owning side to null (unless already changed)
-            if ($offer->getProduct() === $this) {
-                $offer->setProduct(null);
-            }
-        }
 
         return $this;
     }
