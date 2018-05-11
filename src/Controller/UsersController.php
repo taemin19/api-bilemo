@@ -15,15 +15,13 @@ class UsersController extends Controller
      * @Route("/users", name="users_list")
      * @Method("GET")
      */
-    public function listAction()
+    public function list()
     {
         $users = $this->getDoctrine()
             ->getRepository('App:User')
             ->findAll();
 
-        $data = $this->get('serializer')->serialize($users, 'json', ['groups' => ['list']]);
-
-        return JsonResponse::fromJsonString($data);
+        return new JsonResponse($users);
     }
 
     /**
@@ -33,19 +31,17 @@ class UsersController extends Controller
      * @Route("/users/{id}", name="users_show", requirements={"id"="\d+"})
      * @Method("GET")
      */
-    public function showAction(int $id)
+    public function show(int $id)
     {
         $user = $this->getDoctrine()
             ->getRepository('App:User')
             ->find($id);
 
         if (empty($user)) {
-            return new JsonResponse(['message' => 'Not found.'], 404);
+            return new JsonResponse(['message' => 'User not found.'], 404);
         }
 
-        $data = $this->get('serializer')->serialize($user, 'json');
-
-        return JsonResponse::fromJsonString($data);
+        return new JsonResponse($user);
     }
 
     /**
@@ -55,19 +51,19 @@ class UsersController extends Controller
      * @Route("/users/{id}", name="users_delete", requirements={"id"="\d+"})
      * @Method("DELETE")
      */
-    public function deleteAction(int $id)
+    public function delete(int $id)
     {
         $user =$this->getDoctrine()
             ->getRepository('App:User')
             ->find($id);
 
-        // Idempotent: return a 204 in all cases
-        if ($user) {
-            $em = $this->getDoctrine()->getManager();
-
-            $em->remove($user);
-            $em->flush();
+        if (empty($user)) {
+            return new JsonResponse(['message' => 'User not found.'], 404);
         }
+
+        $em = $this->getDoctrine()->getManager();
+        $em->remove($user);
+        $em->flush();
 
         return new JsonResponse(null, 204);
     }

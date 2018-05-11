@@ -2,53 +2,50 @@
 
 namespace App\Entity;
 
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
-use Symfony\Component\Serializer\Annotation\Groups;
 
 /**
  * @ORM\Table(name="products")
  * @ORM\Entity(repositoryClass="App\Repository\ProductRepository")
  */
-class Product
+class Product implements \JsonSerializable
 {
     /**
      * @ORM\Id()
      * @ORM\GeneratedValue()
      * @ORM\Column(type="integer")
-     * @Groups({"list","product","offer"})
      */
     private $id;
 
     /**
      * @ORM\Column(type="string", length=255)
-     * @Groups({"list","product","offer"})
      */
     private $model;
 
     /**
      * @ORM\Column(type="string", length=255)
-     * @Groups({"product"})
      */
     private $brand;
 
     /**
-     * @ORM\Column(type="text")
-     * @Groups({"product"})
+     * @ORM\Column(type="smallint")
      */
-    private $description;
+    private $storage;
 
     /**
-     * @ORM\OneToMany(targetEntity="App\Entity\Offer", mappedBy="product")
-     * @Groups({"product"})
+     * @ORM\Column(type="string", length=255)
      */
-    private $offers;
+    private $color;
 
-    public function __construct()
-    {
-        $this->offers = new ArrayCollection();
-    }
+    /**
+     * @ORM\Column(type="float")
+     */
+    private $price;
+
+    /**
+     * @ORM\Column(type="text")
+     */
+    private $description;
 
     public function getId()
     {
@@ -79,6 +76,42 @@ class Product
         return $this;
     }
 
+    public function getStorage(): ?int
+    {
+        return $this->storage;
+    }
+
+    public function setStorage(int $storage): self
+    {
+        $this->storage = $storage;
+
+        return $this;
+    }
+
+    public function getColor(): ?string
+    {
+        return $this->color;
+    }
+
+    public function setColor(string $color): self
+    {
+        $this->color = $color;
+
+        return $this;
+    }
+
+    public function getPrice(): ?float
+    {
+        return $this->price;
+    }
+
+    public function setPrice(float $price): self
+    {
+        $this->price = $price;
+
+        return $this;
+    }
+
     public function getDescription(): ?string
     {
         return $this->description;
@@ -92,33 +125,22 @@ class Product
     }
 
     /**
-     * @return Collection|Offer[]
+     * Specify data which should be serialized to JSON
+     * @link http://php.net/manual/en/jsonserializable.jsonserialize.php
+     * @return mixed data which can be serialized by <b>json_encode</b>,
+     * which is a value of any type other than a resource.
+     * @since 5.4.0
      */
-    public function getOffers(): Collection
+    public function jsonSerialize()
     {
-        return $this->offers;
-    }
-
-    public function addOffer(Offer $offer): self
-    {
-        if (!$this->offers->contains($offer)) {
-            $this->offers[] = $offer;
-            $offer->setProduct($this);
-        }
-
-        return $this;
-    }
-
-    public function removeOffer(Offer $offer): self
-    {
-        if ($this->offers->contains($offer)) {
-            $this->offers->removeElement($offer);
-            // set the owning side to null (unless already changed)
-            if ($offer->getProduct() === $this) {
-                $offer->setProduct(null);
-            }
-        }
-
-        return $this;
+        return [
+            'id' => $this->getId(),
+            'model' => $this->getModel(),
+            'brand' => $this->getBrand(),
+            'storage' => $this->getStorage(),
+            'color' => $this->getColor(),
+            'price' => $this->getPrice(),
+            'description' => $this->getDescription(),
+        ];
     }
 }

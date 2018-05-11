@@ -15,36 +15,32 @@ class ProductsController extends Controller
      * @Route("/products", name="products_list")
      * @Method("GET")
      */
-    public function listAction()
+    public function list()
     {
         $products = $this->getDoctrine()
             ->getRepository('App:Product')
             ->findAll();
 
-        $data = $this->get('serializer')->serialize($products, 'json', ['groups' => ['list']]);
-
-        return JsonResponse::fromJsonString($data);
+        return new JsonResponse($products);
     }
 
     /**
      * @param int $id
      * @return JsonResponse
      *
-     * @Route("/products/{id}", name="products_show")
+     * @Route("/products/{id}", name="products_show", requirements={"id"="\d+"})
      * @Method("GET")
      */
-    public function showAction(int $id)
+    public function show(int $id)
     {
         $product = $this->getDoctrine()
             ->getRepository('App:Product')
             ->find($id);
 
         if (empty($product)) {
-            return new JsonResponse(['message' => 'Not found.'], 404);
+            return new JsonResponse(['message' => 'Product not found.'], 404);
         }
 
-        $data = $this->get('serializer')->serialize($product, 'json', ['groups' => ['product']]);
-
-        return JsonResponse::fromJsonString($data);
+        return new JsonResponse($product);
     }
 }
