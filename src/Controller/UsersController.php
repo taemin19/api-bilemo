@@ -3,12 +3,15 @@
 namespace App\Controller;
 
 use App\Entity\User;
+use App\Exception\ApiProblem;
+use App\Exception\ApiProblemException;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 class UsersController extends Controller
 {
@@ -41,7 +44,7 @@ class UsersController extends Controller
             ->find($id);
 
         if (empty($user)) {
-            return new JsonResponse(['message' => 'User not found.'], 404);
+            throw $this->createNotFoundException(sprintf('No user found with id "%s"', $id));
         }
 
         return new JsonResponse($user);
@@ -61,7 +64,7 @@ class UsersController extends Controller
             ->find($id);
 
         if (empty($user)) {
-            return new JsonResponse(['message' => 'User not found.'], 404);
+            throw $this->createNotFoundException(sprintf('No user found with id "%s"', $id));
         }
 
         $em = $this->getDoctrine()->getManager();
@@ -72,19 +75,42 @@ class UsersController extends Controller
     }
 
     /**
+     * @param Request $request
+     * @param ValidatorInterface $validator
      * @return JsonResponse
      *
      * @Route("/users", name="users_new")
      * @Method("POST")
      */
-    public function new(Request $request)
+    public function new(Request $request, ValidatorInterface $validator)
     {
         $data = json_decode($request->getContent(), true);
+
+        if ($data === null) {
+            $apiProblem = new ApiProblem(400, ApiProblem::TYPE_INVALID_REQUEST_BODY_FORMAT);
+
+            throw new ApiProblemException($apiProblem);
+        }
 
         $user = new User();
         $user->setFirstname($data['firstname']);
         $user->setLastname($data['lastname']);
         $user->setEmail($data['email']);
+
+        $errors = $validator->validate($user);
+
+        if (count($errors) > 0) {
+            $message = [];
+
+            foreach ($errors as $error) {
+                $message[][$error->getPropertyPath()] = $error->getMessage();
+            }
+
+            $apiProblem = new ApiProblem(400, ApiProblem::TYPE_VALIDATION_ERROR);
+            $apiProblem->set('invalid-params', $message);
+
+            throw new ApiProblemException($apiProblem);
+        }
 
         $em = $this->getDoctrine()->getManager();
         $em->persist($user);
