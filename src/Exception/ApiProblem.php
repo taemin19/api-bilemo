@@ -9,19 +9,34 @@ use Symfony\Component\HttpFoundation\Response;
  */
 class ApiProblem
 {
+    const TYPE_VALIDATION_ERROR = 'validation-error';
+    const TYPE_INVALID_REQUEST_BODY_FORMAT = 'invalid-body-format';
+
+    private static $titles = array(
+        self::TYPE_VALIDATION_ERROR => 'Validation error(s) found',
+        self::TYPE_INVALID_REQUEST_BODY_FORMAT => 'Invalid JSON format sent',
+    );
+
     private $statusCode;
     private $type;
     private $title;
     private $extraData = [];
 
-    public function __construct($statusCode)
+    public function __construct($statusCode, $type = null)
     {
         $this->statusCode = $statusCode;
 
-        $type = 'about:blank';
-        $title = isset(Response::$statusTexts[$statusCode])
-            ? Response::$statusTexts[$statusCode]
-            : 'Unknown status code';
+        if ($type === null) {
+            $type = 'about:blank';
+            $title = isset(Response::$statusTexts[$statusCode])
+                ? Response::$statusTexts[$statusCode]
+                : 'Unknown status code.';
+        } else {
+            if (!isset(self::$titles[$type])) {
+                throw new \InvalidArgumentException('No title for type '.$type);
+            }
+            $title = self::$titles[$type];
+        }
 
         $this->type = $type;
         $this->title = $title;
