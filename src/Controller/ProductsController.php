@@ -38,7 +38,7 @@ class ProductsController extends Controller
             ->find($id);
 
         if (empty($product)) {
-            return new JsonResponse(['message' => 'Product not found.'], 404);
+            throw $this->createNotFoundException(sprintf('No product found with id "%s"', $id));
         }
 
         return new JsonResponse($product);

@@ -41,7 +41,7 @@ class UsersController extends Controller
             ->find($id);
 
         if (empty($user)) {
-            return new JsonResponse(['message' => 'User not found.'], 404);
+            throw $this->createNotFoundException(sprintf('No user found with id "%s"', $id));
         }
 
         return new JsonResponse($user);
@@ -61,7 +61,7 @@ class UsersController extends Controller
             ->find($id);
 
         if (empty($user)) {
-            return new JsonResponse(['message' => 'User not found.'], 404);
+            throw $this->createNotFoundException(sprintf('No user found with id "%s"', $id));
         }
 
         $em = $this->getDoctrine()->getManager();
