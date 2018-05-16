@@ -25,13 +25,13 @@ class ProductsController extends Controller
     }
 
     /**
-     * @param int $id
+     * @param $id
      * @return JsonResponse
      *
-     * @Route("/products/{id}", name="products_show", requirements={"id"="\d+"})
+     * @Route("/products/{id}", name="products_show")
      * @Method("GET")
      */
-    public function show(int $id)
+    public function show($id)
     {
         $product = $this->getDoctrine()
             ->getRepository('App:Product')

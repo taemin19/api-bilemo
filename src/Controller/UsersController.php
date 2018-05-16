@@ -31,13 +31,13 @@ class UsersController extends Controller
     }
 
     /**
-     * @param int $id
+     * @param $id
      * @return JsonResponse
      *
-     * @Route("/users/{id}", name="users_show", requirements={"id"="\d+"})
+     * @Route("/users/{id}", name="users_show")
      * @Method("GET")
      */
-    public function show(int $id)
+    public function show($id)
     {
         $user = $this->getDoctrine()
             ->getRepository('App:User')
@@ -51,13 +51,13 @@ class UsersController extends Controller
     }
 
     /**
-     * @param int $id
+     * @param $id
      * @return JsonResponse
      *
-     * @Route("/users/{id}", name="users_delete", requirements={"id"="\d+"})
+     * @Route("/users/{id}", name="users_delete")
      * @Method("DELETE")
      */
-    public function delete(int $id)
+    public function delete($id)
     {
         $user =$this->getDoctrine()
             ->getRepository('App:User')
