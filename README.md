@@ -26,11 +26,21 @@ The following bundles/libraries are used:
 Copy the repository and execute:
 - `composer install`
 
-#### 2. Set application parameters
+#### 2. Create Database
+Creating Database:
+- `php bin/console doctrine:database:create`
+- `php bin/console doctrine:database:create --env=test` for testing
+
+Creating Database Tables/Schema:
+- `php bin/console doctrine:migrations:migrate`
 
 #### 3. Load fixtures
-Execute:
-- `php bin/console doctrine:fixtures:load` to load a set of fixtures.
+Loading a set of fixtures.:
+- `php bin/console doctrine:fixtures:load`
+
+#### 4. Functional Testing
+Testing with Behat:
+- `vendor/bin/behat`
 
 ### Author
 - Daniel Thébault
