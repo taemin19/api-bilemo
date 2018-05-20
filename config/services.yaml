@@ -30,3 +30,8 @@ services:
         class: App\EventListener\HashPasswordListener
         tags:
             - { name: doctrine.event_subscriber }
+
+    app.event_listener.authentication_exception_listener:
+        class: App\EventListener\AuthenticationExceptionListener
+        tags:
+            - { name: kernel.event_listener, event: lexik_jwt_authentication.on_authentication_failure, method: onAuthenticationFailure }
