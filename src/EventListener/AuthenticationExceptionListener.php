@@ -4,6 +4,7 @@ namespace App\EventListener;
 
 use App\Exception\ApiProblem;
 use Lexik\Bundle\JWTAuthenticationBundle\Event\AuthenticationFailureEvent;
+use Lexik\Bundle\JWTAuthenticationBundle\Event\JWTExpiredEvent;
 use Lexik\Bundle\JWTAuthenticationBundle\Event\JWTInvalidEvent;
 use Lexik\Bundle\JWTAuthenticationBundle\Event\JWTNotFoundEvent;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -43,6 +44,19 @@ class AuthenticationExceptionListener
         $message = 'JWT Token not found.';
 
         $apiProblem = $this->createApiProblem(403, $message);
+        $apiProblem->headers->set('WWW-Authenticate', 'Bearer');
+
+        $event->setResponse($apiProblem);
+    }
+
+    /**
+     * @param JWTExpiredEvent $event
+     */
+    public function onJWTExpired(JWTExpiredEvent $event)
+    {
+        $message = 'JWT token is expired, please renew it.';
+
+        $apiProblem = $this->createApiProblem(401, $message);
         $apiProblem->headers->set('WWW-Authenticate', 'Bearer');
 
         $event->setResponse($apiProblem);
