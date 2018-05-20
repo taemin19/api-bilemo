@@ -5,6 +5,7 @@ namespace App\EventListener;
 use App\Exception\ApiProblem;
 use Lexik\Bundle\JWTAuthenticationBundle\Event\AuthenticationFailureEvent;
 use Lexik\Bundle\JWTAuthenticationBundle\Event\JWTInvalidEvent;
+use Lexik\Bundle\JWTAuthenticationBundle\Event\JWTNotFoundEvent;
 use Symfony\Component\HttpFoundation\JsonResponse;
 
 class AuthenticationExceptionListener
@@ -27,6 +28,19 @@ class AuthenticationExceptionListener
     public function onJWTInvalid(JWTInvalidEvent $event)
     {
         $message = 'JWT token is invalid.';
+
+        $apiProblem = $this->createApiProblem(403, $message);
+        $apiProblem->headers->set('WWW-Authenticate', 'Bearer');
+
+        $event->setResponse($apiProblem);
+    }
+
+    /**
+     * @param JWTNotFoundEvent $event
+     */
+    public function onJWTNotFound(JWTNotFoundEvent $event)
+    {
+        $message = 'JWT Token not found.';
 
         $apiProblem = $this->createApiProblem(403, $message);
         $apiProblem->headers->set('WWW-Authenticate', 'Bearer');
