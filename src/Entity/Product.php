@@ -134,13 +134,18 @@ class Product implements \JsonSerializable
     public function jsonSerialize()
     {
         return [
-            'id' => $this->getId(),
-            'model' => $this->getModel(),
-            'brand' => $this->getBrand(),
-            'storage' => $this->getStorage(),
-            'color' => $this->getColor(),
-            'price' => $this->getPrice(),
-            'description' => $this->getDescription(),
+            'id' => $this->id,
+            'model' => $this->model,
+            'brand' => $this->brand,
+            'storage' => $this->storage,
+            'color' => $this->color,
+            'price' => $this->price,
+            'description' => $this->description,
+            '_links' => [
+                'self' => [
+                    'href' => '/products/'.$this->id
+                ]
+            ]
         ];
     }
 }
