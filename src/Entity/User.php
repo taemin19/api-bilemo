@@ -90,10 +90,22 @@ class User implements \JsonSerializable
     public function jsonSerialize()
     {
         return [
-            'id' => $this->getId(),
-            'firstname' => $this->getFirstname(),
-            'lastname' => $this->getLastname(),
-            'email' => $this->getEmail()
+            'id' => $this->id,
+            'firstname' => $this->firstname,
+            'lastname' => $this->lastname,
+            'email' => $this->email,
+            '_links' => [
+                'self' => [
+                   'href' => '/users/'.$this->id
+                ],
+                'delete' => [
+                    'href' => '/users/'.$this->id
+                ],
+                'create' => [
+                    'href' => '/users/'.$this->id
+                ]
+
+            ]
         ];
     }
 }
