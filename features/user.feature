@@ -4,6 +4,7 @@ Feature: User
   I need to be able to retrieve one user / a collection of users
   I need to be able to create / delete an user
 
+  @login
   Scenario: Retrieve one user
     Given the following users exist:
       | firstname | lastname | email        |
@@ -17,6 +18,7 @@ Feature: User
     And the JSON node "lastname" should contain "doe"
     And the JSON node "email" should contain "john@doe.com"
 
+  @login
   Scenario: Retrieve a collection of users
     Given the following users exist:
       | firstname | lastname | email        |
@@ -36,6 +38,7 @@ Feature: User
     And the JSON node "[1].lastname" should contain "doe"
     And the JSON node "[1].email" should contain "jane@doe.com"
 
+  @login
   Scenario: Create an user
     When I send a "POST" request to "/users" with body:
     """
@@ -50,6 +53,7 @@ Feature: User
     And the header "Location" should be equal to "http://127.0.0.1:8000/users/1"
     And the response should be in JSON
 
+  @login
   Scenario: Delete an user
     Given the following users exist:
       | firstname | lastname | email        |
@@ -58,9 +62,9 @@ Feature: User
     Then the response status code should be 204
     And the response should be empty
 
-  Scenario: Proper 404 exception if an user is not found
-    When I send a "GET" request to "/users/0"
-    When I send a "DELETE" request to "/users/0"
+  @login
+  Scenario Outline: Proper 404 exception if an user is not found
+    When I send a "<method>" request to "<url>"
     Then the response status code should be 404
     And the header "Content-Type" should be equal to "application/problem+json"
     And the response should be in JSON
@@ -69,6 +73,12 @@ Feature: User
     And the JSON node "title" should contain "Not Found"
     And the JSON node "detail" should contain 'No user found with id "0"'
 
+    Examples:
+      | url      | method |
+      | /users/0 | GET    |
+      | /users/0 | DELETE |
+
+  @login
   Scenario: Proper 400 exception if validation failed on user creation
     When I send a "POST" request to "/users" with body:
     """
@@ -88,12 +98,10 @@ Feature: User
     And the JSON node "invalid-params[1].lastname" should contain "This value should not be blank."
     And the JSON node "invalid-params[2].email" should contain "This value is not a valid email address."
 
+  @login
   Scenario: Proper 400 exception if invalid body on user creation
     When I send a "POST" request to "/users" with body:
     """
-      "firstname": "john",
-      "lastname": "doe",
-      "email": "john@doe.com"
     """
     Then the response status code should be 400
     And the header "Content-Type" should be equal to "application/problem+json"
