@@ -11,12 +11,15 @@ Feature: User
       | john      | doe      | john@doe.com |
     When I send a "GET" request to "/users/1"
     Then the response status code should be 200
-    And the header "Content-Type" should be equal to "application/json"
+    And the header "Content-Type" should be equal to "application/hal+json"
     And the response should be in JSON
     And the JSON node "id" should contain "1"
     And the JSON node "firstname" should contain "john"
     And the JSON node "lastname" should contain "doe"
     And the JSON node "email" should contain "john@doe.com"
+    And the JSON node "_links.self.href" should contain "/users/1"
+    And the JSON node "_links.delete.href" should contain "/users/1"
+    And the JSON node "_links.create.href" should contain "/users/1"
 
   @login
   Scenario: Retrieve a collection of users
@@ -26,17 +29,23 @@ Feature: User
       | jane      | doe      | jane@doe.com |
     When I send a "GET" request to "/users"
     Then the response status code should be 200
-    And the header "Content-Type" should be equal to "application/json"
+    And the header "Content-Type" should be equal to "application/hal+json"
     And the response should be in JSON
     And the JSON node " " should have 2 elements
     And the JSON node "[0].id" should contain "1"
     And the JSON node "[0].firstname" should contain "john"
     And the JSON node "[0].lastname" should contain "doe"
     And the JSON node "[0].email" should contain "john@doe.com"
+    And the JSON node "[0]._links.self.href" should contain "/users/1"
+    And the JSON node "[0]._links.delete.href" should contain "/users/1"
+    And the JSON node "[0]._links.create.href" should contain "/users/1"
     And the JSON node "[1].id" should contain "2"
     And the JSON node "[1].firstname" should contain "jane"
     And the JSON node "[1].lastname" should contain "doe"
     And the JSON node "[1].email" should contain "jane@doe.com"
+    And the JSON node "[1]._links.self.href" should contain "/users/2"
+    And the JSON node "[1]._links.delete.href" should contain "/users/2"
+    And the JSON node "[1]._links.create.href" should contain "/users/2"
 
   @login
   Scenario: Create an user
@@ -49,9 +58,16 @@ Feature: User
     }
     """
     Then the response status code should be 201
-    And the header "Content-Type" should be equal to "application/json"
+    And the header "Content-Type" should be equal to "application/hal+json"
     And the header "Location" should be equal to "http://127.0.0.1:8000/users/1"
     And the response should be in JSON
+    And the JSON node "id" should contain "1"
+    And the JSON node "firstname" should contain "john"
+    And the JSON node "lastname" should contain "doe"
+    And the JSON node "email" should contain "john@doe.com"
+    And the JSON node "_links.self.href" should contain "/users/1"
+    And the JSON node "_links.delete.href" should contain "/users/1"
+    And the JSON node "_links.create.href" should contain "/users/1"
 
   @login
   Scenario: Delete an user
