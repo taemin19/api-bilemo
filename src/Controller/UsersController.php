@@ -27,7 +27,7 @@ class UsersController extends Controller
             ->getRepository('App:User')
             ->findAll();
 
-        return new JsonResponse($users);
+        return new JsonResponse($users, 200, ['Content-Type' => 'application/hal+json']);
     }
 
     /**
@@ -47,7 +47,7 @@ class UsersController extends Controller
             throw $this->createNotFoundException(sprintf('No user found with id "%s"', $id));
         }
 
-        return new JsonResponse($user);
+        return new JsonResponse($user, 200, ['Content-Type' => 'application/hal+json']);
     }
 
     /**
@@ -122,6 +122,6 @@ class UsersController extends Controller
             UrlGeneratorInterface::ABSOLUTE_URL
         );
 
-        return new JsonResponse($data, 201, ['Location' => $userUrl]);
+        return new JsonResponse($user, 201, ['Location' => $userUrl, 'Content-Type' => 'application/hal+json']);
     }
 }

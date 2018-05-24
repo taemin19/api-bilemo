@@ -21,7 +21,7 @@ class ProductsController extends Controller
             ->getRepository('App:Product')
             ->findAll();
 
-        return new JsonResponse($products);
+        return new JsonResponse($products, 200, ['Content-Type' => 'application/hal+json']);
     }
 
     /**
@@ -41,6 +41,6 @@ class ProductsController extends Controller
             throw $this->createNotFoundException(sprintf('No product found with id "%s"', $id));
         }
 
-        return new JsonResponse($product);
+        return new JsonResponse($product, 200, ['Content-Type' => 'application/hal+json']);
     }
 }
