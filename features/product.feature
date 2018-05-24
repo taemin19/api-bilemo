@@ -3,6 +3,7 @@ Feature: Product
   As an API client
   I need to be able to retrieve one product / a collection of products
 
+  @login
   Scenario: Retrieve one product
     Given the following products exist:
       | model     | brand   | description | storage | color | price  |
@@ -19,6 +20,7 @@ Feature: Product
     And the JSON node "color" should contain "black"
     And the JSON node "price" should contain "849.99"
 
+  @login
   Scenario: Retrieve a collection of products
     Given the following products exist:
       | model     | brand   | description | storage | color  | price   |
@@ -52,6 +54,7 @@ Feature: Product
     And the JSON node "[2].color" should contain "blue"
     And the JSON node "[2].price" should contain "649.99"
 
+  @login
   Scenario: Proper 404 exception if a product is not found
     When I send a "GET" request to "/products/0"
     Then the response status code should be 404
