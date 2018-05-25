@@ -4,9 +4,9 @@ Feature: User
   I need to be able to retrieve one user / a collection of users
   I need to be able to create / delete an user
 
-  @login
+  @loginAsClient1
   Scenario: Retrieve one user
-    Given the following users exist:
+    Given the following users exist for client1:
       | firstname | lastname | email        |
       | john      | doe      | john@doe.com |
     When I send a "GET" request to "/users/1"
@@ -21,9 +21,9 @@ Feature: User
     And the JSON node "_links.delete.href" should contain "/users/1"
     And the JSON node "_links.create.href" should contain "/users/1"
 
-  @login
+  @loginAsClient1
   Scenario: Retrieve a collection of users
-    Given the following users exist:
+    Given the following users exist for client1:
       | firstname | lastname | email        |
       | john      | doe      | john@doe.com |
       | jane      | doe      | jane@doe.com |
@@ -47,7 +47,7 @@ Feature: User
     And the JSON node "[1]._links.delete.href" should contain "/users/2"
     And the JSON node "[1]._links.create.href" should contain "/users/2"
 
-  @login
+  @loginAsClient1
   Scenario: Create an user
     When I send a "POST" request to "/users" with body:
     """
@@ -69,16 +69,27 @@ Feature: User
     And the JSON node "_links.delete.href" should contain "/users/1"
     And the JSON node "_links.create.href" should contain "/users/1"
 
-  @login
+  @loginAsClient1
   Scenario: Delete an user
-    Given the following users exist:
+    Given the following users exist for client1:
       | firstname | lastname | email        |
       | john      | doe      | john@doe.com |
     When I send a "DELETE" request to "/users/1"
     Then the response status code should be 204
     And the response should be empty
 
-  @login
+  @loginAsClient1
+  Scenario: Proper 404 exception if an users list is empty
+    When I send a "GET" request to "/users"
+    Then the response status code should be 404
+    And the header "Content-Type" should be equal to "application/problem+json"
+    And the response should be in JSON
+    And the JSON node "status" should contain "404"
+    And the JSON node "type" should contain "about:blank"
+    And the JSON node "title" should contain "Not Found"
+    And the JSON node "detail" should contain 'No users created.'
+
+  @loginAsClient1
   Scenario Outline: Proper 404 exception if an user is not found
     When I send a "<method>" request to "<url>"
     Then the response status code should be 404
@@ -94,7 +105,7 @@ Feature: User
       | /users/0 | GET    |
       | /users/0 | DELETE |
 
-  @login
+  @loginAsClient1
   Scenario: Proper 400 exception if validation failed on user creation
     When I send a "POST" request to "/users" with body:
     """
@@ -114,7 +125,7 @@ Feature: User
     And the JSON node "invalid-params[1].lastname" should contain "This value should not be blank."
     And the JSON node "invalid-params[2].email" should contain "This value is not a valid email address."
 
-  @login
+  @loginAsClient1
   Scenario: Proper 400 exception if invalid body on user creation
     When I send a "POST" request to "/users" with body:
     """
@@ -124,3 +135,16 @@ Feature: User
     And the JSON node "status" should contain "400"
     And the JSON node "type" should contain "invalid-body-format"
     And the JSON node "title" should contain "Invalid JSON format sent"
+
+  @loginAsClient1
+  Scenario: Proper 403 exception if client1 try accessing to an user of client2
+    Given the following users exist for client2:
+      | firstname | lastname | email        |
+      | john      | doe      | john@doe.com |
+    When I send a "GET" request to "/users/1"
+    Then the response status code should be 403
+    And the header "Content-Type" should be equal to "application/problem+json"
+    And the JSON node "status" should contain "403"
+    And the JSON node "type" should contain "about:blank"
+    And the JSON node "title" should contain "Forbidden"
+    And the JSON node "detail" should contain "Access Denied."

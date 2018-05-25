@@ -3,7 +3,7 @@ Feature: Product
   As an API client
   I need to be able to retrieve one product / a collection of products
 
-  @login
+  @loginAsClient1
   Scenario: Retrieve one product
     Given the following products exist:
       | model     | brand   | description | storage | color | price  |
@@ -21,7 +21,7 @@ Feature: Product
     And the JSON node "price" should contain "849.99"
     And the JSON node "_links.self.href" should contain "/products/1"
 
-  @login
+  @loginAsClient1
   Scenario: Retrieve a collection of products
     Given the following products exist:
       | model     | brand   | description | storage | color  | price   |
@@ -58,7 +58,7 @@ Feature: Product
     And the JSON node "[2].price" should contain "649.99"
     And the JSON node "[2]._links.self.href" should contain "/products/3"
 
-  @login
+  @loginAsClient1
   Scenario: Proper 404 exception if a product is not found
     When I send a "GET" request to "/products/0"
     Then the response status code should be 404

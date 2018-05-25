@@ -28,6 +28,8 @@ class FeatureContext implements Context
      */
     private $restContext;
 
+    private $currentClient;
+
     public function __construct(KernelInterface $kernel, JWTManager $jwtManager)
     {
         $this->kernel = $kernel;
@@ -39,21 +41,26 @@ class FeatureContext implements Context
      */
     public function clearData()
     {
-        $purger = new ORMPurger($this->kernel->getContainer()->get('doctrine')->getManager());
+        $purger = new ORMPurger($this->kernel->getContainer()->get('doctrine')->getManager(), ['client']);
         $purger->setPurgeMode(ORMPurger::PURGE_MODE_TRUNCATE);
+        $purger->purge();
+
+        $purger = new ORMPurger($this->kernel->getContainer()->get('doctrine')->getManager(), ['users']);
         $purger->purge();
     }
 
     /**
      * @param BeforeScenarioScope $scope
-     * @BeforeScenario @login
+     * @BeforeScenario @loginAsClient1
      */
     public function login(BeforeScenarioScope $scope)
     {
         $client = new Client();
-        $client->setName('client');
-        $client->setUsername('username');
-        $client->setPassword('password');
+        $client->setName('client1');
+        $client->setUsername('client1');
+        $client->setPassword('client1');
+
+        $this->currentClient = $client;
 
         $em = $this->kernel->getContainer()->get('doctrine')->getManager();
         $em->persist($client);
@@ -89,9 +96,9 @@ class FeatureContext implements Context
 
     /**
      * @param TableNode $table
-     * @Given the following users exist:
+     * @Given the following users exist for client1:
      */
-    public function theFollowingUsersExist(TableNode $table)
+    public function theFollowingUsersExistForClient1(TableNode $table)
     {
         $em = $this->kernel->getContainer()->get('doctrine')->getManager();
 
@@ -100,6 +107,35 @@ class FeatureContext implements Context
             $user->setFirstname($userHash['firstname']);
             $user->setLastname($userHash['lastname']);
             $user->setEmail($userHash['email']);
+            $user->setClient($this->currentClient);
+
+            $em->persist($user);
+        }
+
+        $em->flush();
+    }
+
+    /**
+     * @param TableNode $table
+     * @Given the following users exist for client2:
+     */
+    public function theFollowingUsersExistForClient2(TableNode $table)
+    {
+        $em = $this->kernel->getContainer()->get('doctrine')->getManager();
+
+        $client = new Client();
+        $client->setName('client2');
+        $client->setUsername('client2');
+        $client->setPassword('client2');
+
+        $em->persist($client);
+
+        foreach ($table->getHash() as $userHash) {
+            $user = new User();
+            $user->setFirstname($userHash['firstname']);
+            $user->setLastname($userHash['lastname']);
+            $user->setEmail($userHash['email']);
+            $user->setClient($client);
 
             $em->persist($user);
         }
