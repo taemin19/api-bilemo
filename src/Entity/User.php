@@ -39,6 +39,12 @@ class User implements \JsonSerializable
      */
     private $email;
 
+    /**
+     * @ORM\ManyToOne(targetEntity="App\Entity\Client", inversedBy="users")
+     * @ORM\JoinColumn(nullable=false)
+     */
+    private $client;
+
     public function getId()
     {
         return $this->id;
@@ -76,6 +82,18 @@ class User implements \JsonSerializable
     public function setEmail(string $email): self
     {
         $this->email = $email;
+
+        return $this;
+    }
+
+    public function getClient(): ?Client
+    {
+        return $this->client;
+    }
+
+    public function setClient(?Client $client): self
+    {
+        $this->client = $client;
 
         return $this;
     }
