@@ -23,9 +23,15 @@ class UsersController extends Controller
      */
     public function list()
     {
+        $client = $this->getUser();
+
         $users = $this->getDoctrine()
             ->getRepository('App:User')
-            ->findAll();
+            ->findBy(array('client' => $client));
+
+        if (empty($users)) {
+            throw $this->createNotFoundException('No users created.');
+        }
 
         return new JsonResponse($users, 200, ['Content-Type' => 'application/hal+json']);
     }
@@ -47,6 +53,10 @@ class UsersController extends Controller
             throw $this->createNotFoundException(sprintf('No user found with id "%s"', $id));
         }
 
+        if ($user->getClient() != $this->getUser() ) {
+            throw $this->createAccessDeniedException();
+        }
+
         return new JsonResponse($user, 200, ['Content-Type' => 'application/hal+json']);
     }
 
@@ -65,6 +75,10 @@ class UsersController extends Controller
 
         if (empty($user)) {
             throw $this->createNotFoundException(sprintf('No user found with id "%s"', $id));
+        }
+
+        if ($user->getClient() != $this->getUser()) {
+            throw $this->createAccessDeniedException();
         }
 
         $em = $this->getDoctrine()->getManager();
@@ -96,6 +110,7 @@ class UsersController extends Controller
         $user->setFirstname($data['firstname']);
         $user->setLastname($data['lastname']);
         $user->setEmail($data['email']);
+        $user->setClient($this->getUser());
 
         $errors = $validator->validate($user);
 
