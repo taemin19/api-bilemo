@@ -7,6 +7,9 @@ security:
                 class: App:Client
                 property: username
     firewalls:
+        api_doc:
+            pattern: ^/api/doc
+            security: false
         login:
             pattern:  ^/login
             stateless: true
