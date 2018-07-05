@@ -4,13 +4,9 @@ namespace App\EventListener;
 
 use App\Exception\ApiProblem;
 use Lexik\Bundle\JWTAuthenticationBundle\Event\AuthenticationFailureEvent;
-use Lexik\Bundle\JWTAuthenticationBundle\Event\JWTCreatedEvent;
-use Lexik\Bundle\JWTAuthenticationBundle\Event\JWTDecodedEvent;
-use Lexik\Bundle\JWTAuthenticationBundle\Event\JWTEncodedEvent;
 use Lexik\Bundle\JWTAuthenticationBundle\Event\JWTExpiredEvent;
 use Lexik\Bundle\JWTAuthenticationBundle\Event\JWTInvalidEvent;
 use Lexik\Bundle\JWTAuthenticationBundle\Event\JWTNotFoundEvent;
-use Lexik\Bundle\JWTAuthenticationBundle\Exception\JWTDecodeFailureException;
 use Symfony\Component\HttpFoundation\JsonResponse;
 
 class AuthenticationExceptionListener
@@ -22,7 +18,7 @@ class AuthenticationExceptionListener
     {
         $message = 'Bad credentials, please verify that your username/password are correctly set';
 
-        $apiProblem = $this->createApiProblem(401, $message);
+        $apiProblem = $this->createApiProblem(400, $message);
 
         $event->setResponse($apiProblem);
     }
