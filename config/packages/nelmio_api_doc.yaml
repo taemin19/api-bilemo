@@ -1,8 +1,15 @@
 nelmio_api_doc:
+    models: { use_jms: false }
     documentation:
+        #host: http://www.bilemo.com/doc
+        schemes: [http]
         info:
             title: BileMo
-            description: An APi to access a catalog of smartphones
+            description: An APi to access Bilemo's products
+            contact:
+                name: API Support
+                url: http://www.bilemo.com/support
+                email: support@bilemo.com
             version: 1.0.0
         securityDefinitions:
             Bearer:
@@ -12,6 +19,238 @@ nelmio_api_doc:
                 in: header
         security:
             - Bearer: []
+        sandbox:
+            accept_type: 'application/json'
+            body_format:
+                formats: ['json']
+                default_format: 'json'
+            request_format:
+                formats:
+                    json: 'application/json'
+        paths:
+            /login_check:
+                post:
+                    tags:
+                        - Authentication
+                    summary: Creates a JSON Web Token
+                    description: ''
+                    operationId: createJWT
+                    consumes:
+                        - application/json
+                    produces:
+                        - application/json
+                    parameters:
+                        - name: client
+                          in: body
+                          description: The client credentials
+                          schema:
+                              $ref: '#/definitions/Client'
+                    responses:
+                        '200':
+                            description: Token created
+                        '400':
+                            description: Bad credentials
+            /products:
+                get:
+                    tags:
+                        - Product
+                    summary: Retrieves the collection of Product resources
+                    description: ''
+                    operationId: getProducts
+                    consumes:
+                        - application/json
+                    produces:
+                        - application/hal+json
+                    responses:
+                        '200':
+                            description: Product collection response
+                            schema:
+                                $ref: '#/definitions/Product'
+                        '401':
+                            description: Authentication required
+            /products/{id}:
+                get:
+                    tags:
+                        - Product
+                    summary: Retrieves a Product resource
+                    description: ''
+                    operationId: getProduct
+                    consumes:
+                        - application/json
+                    produces:
+                        - application/hal+json
+                    parameters:
+                        - name: id
+                          in: path
+                          description: ID of product
+                          required: true
+                          type: integer
+                    responses:
+                        '200':
+                            description: Product resource response
+                            schema:
+                                $ref: '#/definitions/Product'
+                        '401':
+                            description: Authentication required
+                        '404':
+                            description: Resource not found
+            /users:
+                get:
+                    tags:
+                        - User
+                    summary: Retrieves the collection of User resources
+                    description: ''
+                    operationId: getUsers
+                    consumes:
+                        - application/json
+                    produces:
+                        - application/hal+json
+                    responses:
+                        '200':
+                            description: User collection response
+                            schema:
+                                $ref: '#/definitions/User'
+                        '401':
+                            description: Authentication required
+                post:
+                    tags:
+                        - User
+                    summary: Creates a User resource
+                    description: ''
+                    operationId: addUser
+                    consumes:
+                        - application/json
+                    produces:
+                        - application/hal+json
+                    parameters:
+                        - name: user
+                          in: body
+                          description: The new User resource
+                          schema:
+                              $ref: '#/definitions/User'
+                    responses:
+                        '201':
+                            description: User resource created
+                            schema:
+                                $ref: '#/definitions/User'
+                        '400':
+                            description: Invalid input
+                        '401':
+                            description: Authentication required
+            /users/{id}:
+                get:
+                    tags:
+                        - User
+                    summary: Retrieves a User resource
+                    description: ''
+                    operationId: getUser
+                    consumes:
+                        - application/json
+                    produces:
+                        - application/hal+json
+                    parameters:
+                        - name: id
+                          in: path
+                          description: ID of user
+                          required: true
+                          type: integer
+                    responses:
+                        '200':
+                            description: User resource response
+                            schema:
+                                $ref: '#/definitions/User'
+                        '401':
+                            description: Authentication required
+                        '403':
+                            description: Access denied
+                        '404':
+                            description: Resource not found
+                delete:
+                    tags:
+                        - User
+                    summary: Removes the User resource
+                    description: ''
+                    operationId: deleteUser
+                    consumes:
+                        - application/json
+                    produces:
+                        - application/hal+json
+                    parameters:
+                        - name: id
+                          in: path
+                          description: ID of user
+                          required: true
+                          type: integer
+                    responses:
+                        '204':
+                            description: User resource deleted
+                        '401':
+                            description: Authentication required
+                        '403':
+                            description: Access denied
+                        '404':
+                            description: Resource not found
+        definitions:
+            Client:
+                type: object
+                properties:
+                    id:
+                        type: integer
+                    name:
+                        type: string
+                    username:
+                        type: string
+                    password:
+                        type: string
+                example:
+                    username: client1
+                    password: client1
+            Product:
+                type: object
+                properties:
+                    id:
+                        type: integer
+                        description: The id of the product
+                    model:
+                        type: string
+                        description: The model of the product
+                    brand:
+                        type: string
+                        description: The brand of the product
+                    storage:
+                        type: integer
+                        description: The storage of the product
+                    color:
+                        type: string
+                        description: The color of the product
+                    price:
+                        type: number
+                        format: float
+                        description: The price of the product
+                    description:
+                        type: string
+                        description: The description of the product
+            User:
+                type: object
+                properties:
+                    id:
+                        type: integer
+                        description: The id of the user
+                    firstname:
+                        type: string
+                        description: The firstname of the user
+                    lastname:
+                        type: string
+                        description: The lastname of the user
+                    email:
+                        type: string
+                        format: email
+                        description: The email of the user
+                required:
+                    - firstname
+                    - lastname
+                    - email
+
     areas: # to filter documented areas
         path_patterns:
             - ^/api(?!/doc$) # Accepts routes under /api except /api/doc
