@@ -40,7 +40,7 @@ class UsersController extends Controller
      * @param $id
      * @return JsonResponse
      *
-     * @Route("/users/{id}", name="users_show")
+     * @Route("/users/{id}", requirements={"id" = "\d+"}, name="users_show")
      * @Method("GET")
      */
     public function show($id)
