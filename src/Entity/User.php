@@ -118,11 +118,7 @@ class User implements \JsonSerializable
                 ],
                 'delete' => [
                     'href' => '/users/'.$this->id
-                ],
-                'create' => [
-                    'href' => '/users/'.$this->id
                 ]
-
             ]
         ];
     }
