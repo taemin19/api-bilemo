@@ -28,7 +28,7 @@ class ProductsController extends Controller
      * @param $id
      * @return JsonResponse
      *
-     * @Route("/products/{id}", name="products_show")
+     * @Route("/products/{id}", requirements={"id" = "\d+"}, name="products_show")
      * @Method("GET")
      */
     public function show($id)

@@ -19,7 +19,6 @@ Feature: User
     And the JSON node "email" should contain "john@doe.com"
     And the JSON node "_links.self.href" should contain "/users/1"
     And the JSON node "_links.delete.href" should contain "/users/1"
-    And the JSON node "_links.create.href" should contain "/users/1"
 
   @loginAsClient1
   Scenario: Retrieve a collection of users
@@ -38,14 +37,12 @@ Feature: User
     And the JSON node "[0].email" should contain "john@doe.com"
     And the JSON node "[0]._links.self.href" should contain "/users/1"
     And the JSON node "[0]._links.delete.href" should contain "/users/1"
-    And the JSON node "[0]._links.create.href" should contain "/users/1"
     And the JSON node "[1].id" should contain "2"
     And the JSON node "[1].firstname" should contain "jane"
     And the JSON node "[1].lastname" should contain "doe"
     And the JSON node "[1].email" should contain "jane@doe.com"
     And the JSON node "[1]._links.self.href" should contain "/users/2"
     And the JSON node "[1]._links.delete.href" should contain "/users/2"
-    And the JSON node "[1]._links.create.href" should contain "/users/2"
 
   @loginAsClient1
   Scenario: Create an user
@@ -67,7 +64,6 @@ Feature: User
     And the JSON node "email" should contain "john@doe.com"
     And the JSON node "_links.self.href" should contain "/users/1"
     And the JSON node "_links.delete.href" should contain "/users/1"
-    And the JSON node "_links.create.href" should contain "/users/1"
 
   @loginAsClient1
   Scenario: Delete an user
