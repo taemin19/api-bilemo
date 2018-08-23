@@ -1,0 +1,23 @@
+version: 2
+
+jobs:
+    phpunit:
+        docker:
+            - image: php:7.2.8-fpm-alpine
+        steps:
+            - checkout
+            - run: sudo apk add --no-cache --virtual .build-deps $PHPIZE_DEPS libsqlite3-dev zlib1g-dev
+            - run: sudo docker-php-ext-install zip
+            # Update Composer
+            - run: sudo composer self-update
+            # Download and cache dependencies
+            - restore_cache: # special step to restore the dependency cache if `composer.json` does not change
+                keys:
+                    - composer-v1-{{ checksum "composer.json" }}
+                    - composer-v1-
+            - run: composer install -n --optimize-autoloader --classmap-authoritative
+            - run: composer dump-autoload --optimize --classmap-authoritative
+            - save_cache: # special step to save the dependency cache with the `composer.json` cache key template
+                key: composer-v1-{{ checksum "composer.json" }}
+                paths:
+                    - vendor
