@@ -1,23 +1,40 @@
 version: 2
 
 jobs:
-    phpunit:
-        docker:
-            - image: php:7.2.8-fpm-alpine
-        steps:
-            - checkout
-            - run: sudo apk add --no-cache --virtual .build-deps $PHPIZE_DEPS libsqlite3-dev zlib1g-dev
-            - run: sudo docker-php-ext-install zip
-            # Update Composer
-            - run: sudo composer self-update
-            # Download and cache dependencies
-            - restore_cache: # special step to restore the dependency cache if `composer.json` does not change
-                keys:
-                    - composer-v1-{{ checksum "composer.json" }}
-                    - composer-v1-
-            - run: composer install -n --optimize-autoloader --classmap-authoritative
-            - run: composer dump-autoload --optimize --classmap-authoritative
-            - save_cache: # special step to save the dependency cache with the `composer.json` cache key template
-                key: composer-v1-{{ checksum "composer.json" }}
-                paths:
-                    - vendor
+  build:
+    docker:
+      - image: php:fpm-alpine
+    steps:
+      - checkout
+      - run:
+          name: Install system packages
+          command: apk add --no-cache --virtual .build-deps $PHPIZE_DEPS zlib-dev
+      - run:
+          name: Install PHP extensions
+          command: docker-php-ext-install zip
+      - run:
+          name: Install Composer
+          command: |
+            php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');"
+            php -r "if (hash_file('SHA384', 'composer-setup.php') === '544e09ee996cdf60ece3804abc52599c22b1f40f4323403c44d44fdfdd586475ca9813a858088ffbc1f233e9b180f061') { echo 'Installer verified'; } else { echo 'Installer corrupt'; unlink('composer-setup.php'); } echo PHP_EOL;"
+            php composer-setup.php
+            php -r "unlink('composer-setup.php');"
+      - run:
+          name: Display PHP information
+          command: |
+            php -v
+            php composer.phar --version
+      - restore_cache: # special step to restore the dependency cache if `composer.json` does not change
+          keys:
+            - composer-v1-{{ checksum "composer.json" }}
+            # fallback to using the latest cache if no exact match is found (See https://circleci.com/docs/2.0/caching/)
+            - composer-v1-
+      - run:
+          name: Install project dependencies
+          command: |
+            php composer.phar install -n --optimize-autoloader --classmap-authoritative
+            php composer.phar dump-autoload --optimize --classmap-authoritative
+      - save_cache: # special step to save the dependency cache with the `composer.json` cache key template
+          key: composer-v1-{{ checksum "composer.json" }}
+          paths:
+            - vendor
